@@ -10,12 +10,12 @@ def on_startup():
 
 tags = [
     {
-        'name': 'Users',
-        'description': 'Operations to manage users.'
-    },
-    {
         'name': 'Health Check',
         'description': 'Describe the status of the application and its components.'
+    },
+    {
+        'name': 'Users',
+        'description': 'Operations to manage users.'
     }
 ]
 
