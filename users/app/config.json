@@ -1,0 +1,7 @@
+{
+    "databases": {
+        "mysql": {
+            "url": "mysql+pymysql://root:km05010002@localhost/users"
+        }
+    }
+}
