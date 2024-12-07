@@ -1,3 +1,6 @@
 fastapi
 uvicorn
 dependency-injector
+redis[hiredis]
+pyjwt
+pydantic-settings

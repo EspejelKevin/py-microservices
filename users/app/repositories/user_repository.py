@@ -1,7 +1,6 @@
 from models import User
 from schemas import RegisterUser
 from services import DBService
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 

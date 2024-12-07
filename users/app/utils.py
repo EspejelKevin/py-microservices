@@ -1,16 +1,14 @@
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+from passlib.hash import pbkdf2_sha256
 
 
 class Utils:
     @classmethod
     def hash_password(cls, password: str) -> str:
-        return pwd_context.hash(password)
+        return pbkdf2_sha256.hash(password)
 
     @classmethod
     def verify_password(cls, password: str, hashed_password: str) -> bool:
         try:
-            return pwd_context.verify(password, hashed_password)
+            return pbkdf2_sha256.verify(password, hashed_password)
         except Exception:
             return False

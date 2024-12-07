@@ -1,7 +1,7 @@
-import os
 from contextlib import contextmanager
 from typing import Optional
 
+from config import Config
 from controllers import (HealthChekController, LoginController,
                          RegisterController)
 from database import Database
@@ -11,8 +11,8 @@ from services import UserService
 
 
 class DatabasesContainer(containers.DeclarativeContainer):
-    config = providers.Configuration()
-    mysql = providers.Singleton(Database, url=config.databases.mysql.url)
+    config = providers.Dependency(Config)
+    mysql = providers.Singleton(Database, url=config.provided.mysql_url)
 
 
 class RepositoriesContainer(containers.DeclarativeContainer):
@@ -28,6 +28,7 @@ class ServicesContainer(containers.DeclarativeContainer):
 
 
 class ControllersContainer(containers.DeclarativeContainer):
+    config = providers.Dependency(Config)
     services: ServicesContainer = providers.DependenciesContainer()
     health_check = providers.Factory(
         HealthChekController, user_service=services.user_service)
@@ -35,19 +36,19 @@ class ControllersContainer(containers.DeclarativeContainer):
         RegisterController, user_service=services.user_service
     )
     login_user = providers.Factory(
-        LoginController, user_service=services.user_service
+        LoginController, user_service=services.user_service, config=config
     )
 
 
 class BaseContainer(containers.DeclarativeContainer):
-    config_path = f'{os.path.dirname(__file__)}/config.json'
-    config = providers.Configuration(json_files=[config_path])
+    config = providers.Singleton(Config)
     databases = providers.Container(DatabasesContainer, config=config)
     repositories = providers.Container(
         RepositoriesContainer, databases=databases)
     services = providers.Container(
         ServicesContainer, repositories=repositories)
-    controllers = providers.Container(ControllersContainer, services=services)
+    controllers = providers.Container(
+        ControllersContainer, services=services, config=config)
 
 
 class AppContainer:

@@ -3,5 +3,6 @@ uvicorn
 PyMySQL
 dependency-injector
 alembic
-bcrypt
 passlib
+pydantic-settings
+aiohttp

@@ -1,31 +1,28 @@
 from contextlib import contextmanager
 from typing import Iterator
 
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import Session
+import redis
 
 
 class DBSession:
     def __init__(self, url: str, **connect_args: dict) -> None:
-        self._engine = create_engine(url=url, connect_args=connect_args)
-        self._session = Session(
-            self._engine, autocommit=False, autoflush=False)
+        self._client: redis.Redis = redis.from_url(url, **connect_args)
 
     def __enter__(self):
         return self
 
-    def get_client(self) -> Session:
-        return self._session
+    def get_client(self) -> redis.Redis:
+        return self._client
 
     def is_up(self) -> dict:
         data = {
             'success': True,
-            'dependency': 'MySQL DB',
+            'dependency': 'Redis DB',
             'error': None
         }
 
         try:
-            self._session.execute(text('SELECT 1'))
+            self._client.ping()
         except Exception as e:
             data['success'] = False
             data['error'] = str(e)
@@ -33,7 +30,7 @@ class DBSession:
         return data
 
     def __exit__(self, *exc) -> None:
-        self._session.close()
+        self._client.close()
 
 
 class Database:
